@@ -1,6 +1,6 @@
 package com.ec.sequence3.data.model
 
-import com.ec.sequence3.data.api.PostResponse
+import com.ec.sequence3.data.source.remote.api.PostResponse
 import com.google.gson.annotations.SerializedName
 
 data class PostsResponse(

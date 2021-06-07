@@ -1,4 +1,4 @@
-package com.ec.sequence3.data.database
+package com.ec.sequence3.data.source.local.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

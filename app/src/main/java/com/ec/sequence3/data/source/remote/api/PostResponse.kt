@@ -1,4 +1,4 @@
-package com.ec.sequence3.data.api
+package com.ec.sequence3.data.source.remote.api
 
 import com.google.gson.annotations.SerializedName
 

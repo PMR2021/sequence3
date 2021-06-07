@@ -4,24 +4,21 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ec.sequence3.data.model.Post
 import com.ec.sequence3.R
-import com.ec.sequence3.data.DataProvider
 import com.ec.sequence3.ui.adapter.PostAdapter
 import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
-    private val activityScope = CoroutineScope(
-        SupervisorJob() +
-        Dispatchers.Main
-    )
-    var job : Job? = null
+
     private lateinit var postAdapter: PostAdapter
 
-    private val dataProvider by lazy { DataProvider(this.application) }
+    private val viewModel by viewModels<MainViewModel>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,42 +27,27 @@ class MainActivity : AppCompatActivity() {
         loadAndDisplayPosts()
     }
 
-    private fun refersh() {
-        job?.cancel()
-        job = activityScope.launch {
-            showProgress(true)
-            try {
-                val posts = dataProvider.getPost()
-
-                postAdapter.show(posts)
-
-            } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "${e.message} ", Toast.LENGTH_SHORT).show()
-            }
-            showProgress(false)
-        }
-    }
 
     private fun loadAndDisplayPosts() {
 
-      activityScope.launch {
-            showProgress(true)
-            try {
-                val posts = dataProvider.getPost()
-                postAdapter.show(posts)
-
-            } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "${e.message} ", Toast.LENGTH_SHORT).show()
+        viewModel.loadPost()
+        viewModel.posts.observe(this) { viewState ->
+            when (viewState) {
+                is MainViewModel.ViewState.Content -> {
+                    postAdapter.show(viewState.posts)
+                    showProgress(false)
+                }
+                MainViewModel.ViewState.Loading -> showProgress(true)
+                is MainViewModel.ViewState.Error -> {
+                    showProgress(false)
+                    Toast.makeText(this@MainActivity, "${viewState.message} ", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
-            showProgress(false)
+
         }
 
 
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        activityScope.cancel()
     }
 
     private fun showProgress(show: Boolean) {
