@@ -21,6 +21,8 @@ class MainActivity : AppCompatActivity() {
     var job : Job? = null
     private lateinit var postAdapter: PostAdapter
 
+    private val dataProvider by lazy { DataProvider(this.application) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -33,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         job = activityScope.launch {
             showProgress(true)
             try {
-                val posts = DataProvider.getPostFromApi()
+                val posts = dataProvider.getPost()
 
                 postAdapter.show(posts)
 
@@ -49,7 +51,7 @@ class MainActivity : AppCompatActivity() {
       activityScope.launch {
             showProgress(true)
             try {
-                val posts = DataProvider.getPostFromApi()
+                val posts = dataProvider.getPost()
                 postAdapter.show(posts)
 
             } catch (e: Exception) {

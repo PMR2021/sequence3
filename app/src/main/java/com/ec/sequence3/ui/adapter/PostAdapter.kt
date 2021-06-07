@@ -61,7 +61,7 @@ class PostAdapter(
         fun bind(post: Post, actionListener: ActionListener?) {
             titleTextView.text = post.title
             subTitleTextView.text = post.subTitle
-            Picasso.get().load(post.thumbnail.imageUrl).into(image)
+            Picasso.get().load(post.imageUrl).into(image)
 
             itemView.setOnClickListener {
                 actionListener?.onItemClicked(post)
