@@ -1,9 +1,10 @@
 package com.ec.sequence3.data
 
 import android.content.Context
+import androidx.room.Room
 import com.ec.sequence3.data.api.PostResponse
 import com.ec.sequence3.data.api.ProductHuntService
-import com.ec.sequence3.data.database.PostDao
+import com.ec.sequence3.data.database.ProductHuntRoomDatabase
 import com.ec.sequence3.data.model.Post
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -19,24 +20,22 @@ class DataProvider(context: Context) {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
+    private val roomDatabase =
+        Room.databaseBuilder(context, ProductHuntRoomDatabase::class.java, "room-database").build()
 
     private val service = retrofit.create(ProductHuntService::class.java)
-    private val dao = PostDao(context)
+    private val postDao = roomDatabase.postDao()
 
 
     suspend fun getPost(): List<Post> {
-        return try {
-            val posts = service.getPosts().postResponses.toPosts()
+       return   try {
 
-            posts.forEach {
-
-                dao.save(it)
-            }
-
-            posts
+           service.getPosts().postResponses.toPosts().also {
+               postDao.saveOrUpdate(it)
+           }
 
         } catch (e: Exception) {
-            dao.getPosts()
+            postDao.getPosts()
         }
     }
 
